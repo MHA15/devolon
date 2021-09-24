@@ -1,54 +1,32 @@
-import React from "react";
-import logo from "./logo.svg";
-import Counter from "./features/counter/Counter";
-import { Provider } from "react-redux";
-import store from "./store";
-import styled from "@emotion/styled";
-import { keyframes } from "@emotion/css";
+import React, { Suspense, lazy } from "react";
+import { css } from "@emotion/css";
+import Sidebar from "./features/sidebar";
+import { Switch } from "react-router";
+import { Redirect, Route } from "react-router-dom";
+import Loading from "./components/loading";
+import { mediaQuery } from "./utils/css-commons";
 
-const Container = styled.div`
-  text-align: center;
-`;
-
-const Header = styled.header`
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: #fff;
-`;
-
-const float = keyframes`
-  0% {
-    transform: translateY(0);
-  }
-  100% {
-    transform: translateY(-10px);
-  }
-`;
-
-const Logo = styled.img`
-  height: 20vmin;
-  pointer-events: none;
-
-  @media (prefers-reduced-motion: no-preference) {
-    animation: ${float} 2s alternate infinite;
-  }
-`;
+const Images = lazy(() => import("features/images"));
 
 const App = () => {
   return (
-    <Provider store={store}>
-      <Container>
-        <Header>
-          <Logo src={logo} alt="logo" />
-          <Counter />
-        </Header>
-      </Container>
-    </Provider>
+    <div
+      className={css`
+        display: flex;
+        height: calc(100vh - 2rem);
+        ${mediaQuery.sm} {
+          flex-direction: column;
+        }
+      `}
+    >
+      <Sidebar />
+      <Suspense fallback={<Loading />}>
+        <Switch>
+          <Route path="/:categoryId" exact component={Images} />
+          <Redirect from="/" exact to="/1" />
+        </Switch>
+      </Suspense>
+    </div>
   );
 };
 
