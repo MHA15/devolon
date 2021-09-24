@@ -4,7 +4,7 @@ import Counter from "./features/counter/Counter";
 import { Provider } from "react-redux";
 import store from "./store";
 import styled from "@emotion/styled";
-import { keyframes } from "@emotion/core";
+import { keyframes } from "@emotion/css";
 
 const Container = styled.div`
   text-align: center;

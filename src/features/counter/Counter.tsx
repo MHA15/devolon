@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { increment, decrement, fetchInitial } from "./CounterSlice";
 import { RootState } from "store";
 import styled from "@emotion/styled";
+import Button from "../../components/button";
 
 const Container = styled.div``;
 
@@ -20,26 +21,6 @@ const Value = styled.p`
   font-size: 5rem;
   color: #5fd0ae;
   margin: 2rem 0;
-`;
-
-const Button = styled.button`
-  margin: 0.5rem 0.75rem;
-  font-size: 1.25rem;
-  background: transparent;
-  border-color: #5fd0ae;
-  color: #fff;
-  border-radius: 0.25rem;
-  padding: 0.5rem 0.75rem;
-
-  &:focus {
-    outline: none;
-  }
-  &:active {
-    border-style: solid;
-  }
-  &:hover {
-    cursor: pointer;
-  }
 `;
 
 const Counter: React.FC = () => {
