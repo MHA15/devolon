@@ -2,21 +2,21 @@ import { screen, fireEvent, waitFor } from "@testing-library/react";
 import Images from "./index";
 import React from "react";
 import { imagesReducer } from "./slice";
-import { renderWithRedux, rootInitialState } from "utils/test-helpers";
-import axios from "axios";
+import { renderWithProviders, rootInitialState } from "utils/test-helpers";
+import api from "api";
 import { fetchImagesByCategory } from "./slice";
 
 jest.mock("axios");
-const mockedAxios = axios as jest.Mocked<typeof axios>;
+const mockedAxios = api as jest.Mocked<typeof api>;
 
 describe("<Images />", () => {
   test("shows zero as initial value", () => {
-    renderWithRedux(<Images />);
+    renderWithProviders(<Images />);
     expect(screen.getByText("0")).toBeVisible();
   });
 
   test("shows loading message", () => {
-    renderWithRedux(<Images />, {
+    renderWithProviders(<Images />, {
       ...rootInitialState,
       images: { ...rootInitialState.images, loading: true },
     });
@@ -25,7 +25,7 @@ describe("<Images />", () => {
 
   test("shows error message", () => {
     const errorMessage = "An error occured";
-    renderWithRedux(<Images />, {
+    renderWithProviders(<Images />, {
       ...rootInitialState,
       images: { ...rootInitialState.images, error: errorMessage },
     });
@@ -37,7 +37,7 @@ describe("<Images />", () => {
     mockedAxios.get.mockResolvedValueOnce({ status: 200, data: { name } });
     jest.useFakeTimers();
 
-    const { mockStore } = renderWithRedux(<Images />);
+    const { mockStore } = renderWithProviders(<Images />);
 
     fireEvent.click(screen.getByRole("button", { name: /slow fetch/i }));
 
@@ -59,7 +59,7 @@ describe("<Images />", () => {
     mockedAxios.get.mockResolvedValueOnce({ status: 500 });
     jest.useFakeTimers();
 
-    const { mockStore } = renderWithRedux(<Images />);
+    const { mockStore } = renderWithProviders(<Images />);
 
     fireEvent.click(screen.getByRole("button", { name: /slow fetch/i }));
 

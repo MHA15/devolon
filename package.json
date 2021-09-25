@@ -3,16 +3,17 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@babel/preset-env": "^7.15.6",
     "@craco/craco": "^6.3.0",
     "@emotion-icons/material": "^3.14.0",
     "@emotion/babel-plugin": "^11.3.0",
     "@emotion/css": "^11.1.3",
     "@emotion/styled": "^11.3.0",
     "@reduxjs/toolkit": "^1.6.1",
-    "@testing-library/dom": "^7.21.1",
-    "@testing-library/jest-dom": "^5.11.1",
-    "@testing-library/react": "^10.4.7",
-    "@testing-library/user-event": "^12.0.11",
+    "@testing-library/dom": "^8.6.0",
+    "@testing-library/jest-dom": "^5.14.1",
+    "@testing-library/react": "^12.1.0",
+    "@testing-library/user-event": "^13.2.1",
     "@typescript-eslint/eslint-plugin": "^3.6.1",
     "@typescript-eslint/parser": "^3.6.1",
     "axios": "^0.21.1",
@@ -34,13 +35,22 @@
   "scripts": {
     "start": "craco start",
     "build": "craco build",
-    "test": "craco test",
+    "test": "jest",
     "eject": "craco eject",
     "test:coverage": "npm run test --watchAll false --coverage",
     "lint": "tsc --noEmit && eslint '*/**/*.{ts,tsx}'",
     "lint:fix": "npm run lint --quiet --fix"
   },
   "jest": {
+    "testEnvironment": "jsdom",
+    "transform": {
+      ".+\\.tsx?$": "babel-jest",
+      ".+\\.svg$": "jest-transform-stub"
+    },
+    "moduleDirectories": [
+      "node_modules",
+      "src"
+    ],
     "coveragePathIgnorePatterns": [
       "./src/index.tsx",
       "./src/serviceWorker.ts"
@@ -59,12 +69,18 @@
     ]
   },
   "devDependencies": {
-    "@types/jest": "^26.0.5",
+    "@babel/core": "^7.15.5",
+    "@types/jest": "^26.0.24",
     "@types/node": "^14.0.23",
     "@types/react": "^17.0.19",
     "@types/react-dom": "^17.0.9",
     "@types/react-redux": "^7.1.9",
     "@types/react-router-dom": "^5.3.0",
-    "@types/redux-mock-store": "^1.0.2"
+    "@types/redux-mock-store": "^1.0.2",
+    "babel-jest": "^26.6.3",
+    "jest": "26.6.0",
+    "jest-environment-jsdom": "^27.2.0",
+    "jest-svg-transformer": "^1.0.0",
+    "jest-transform-stub": "^2.0.0"
   }
 }

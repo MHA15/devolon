@@ -1,6 +1,8 @@
 import { render } from "@testing-library/react";
 import React from "react";
 import { Provider } from "react-redux";
+import { Router } from "react-router";
+import { createMemoryHistory } from "history";
 import configureStore from "redux-mock-store";
 import thunk from "redux-thunk";
 import { initialState as imagesInitialState } from "features/images/slice";
@@ -14,13 +16,18 @@ export const rootInitialState = {
   categories: categoriesInitialState,
 };
 
-export const renderWithRedux = (
+export const renderWithProviders = (
   ui: JSX.Element,
   initialState: RootState = rootInitialState
 ) => {
+  const history = createMemoryHistory();
   const store = mockStore(initialState);
   return {
-    ...render(<Provider store={store}>{ui}</Provider>),
+    ...render(
+      <Router history={history}>
+        <Provider store={store}>{ui}</Provider>
+      </Router>
+    ),
     mockStore: store,
   };
 };

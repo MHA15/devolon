@@ -4,9 +4,9 @@ import styled from "@emotion/styled";
 import logo from "logo.svg";
 import { fetchCategories } from "./slice";
 import { Link } from "react-router-dom";
-import { mediaQuery } from "../../utils/css-commons";
-import Loading from "../../components/loading";
-import ErrorMessage from "../../components/error-message";
+import { mediaQuery } from "utils/css-commons";
+import Loading from "components/loading";
+import ErrorMessage from "components/error-message";
 
 const Logo = styled.img``;
 

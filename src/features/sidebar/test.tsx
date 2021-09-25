@@ -1,21 +1,21 @@
 import { screen, fireEvent, waitFor } from "@testing-library/react";
 import React from "react";
 import { categoriesReducer, fetchCategories } from "./slice";
-import { renderWithRedux, rootInitialState } from "utils/test-helpers";
-import axios from "axios";
+import { renderWithProviders, rootInitialState } from "utils/test-helpers";
+import api from "api";
 import Sidebar from "./index";
 
 jest.mock("axios");
-const mockedAxios = axios as jest.Mocked<typeof axios>;
+const mockedAxios = api as jest.Mocked<typeof api>;
 
 describe("<Sidebar />", () => {
   test("shows zero as initial value", () => {
-    renderWithRedux(<Sidebar />);
+    renderWithProviders(<Sidebar />);
     expect(screen.getByText("0")).toBeVisible();
   });
 
   test("shows loading message", () => {
-    renderWithRedux(<Sidebar />, {
+    renderWithProviders(<Sidebar />, {
       ...rootInitialState,
       categories: { ...rootInitialState.categories, loading: true },
     });
@@ -24,7 +24,7 @@ describe("<Sidebar />", () => {
 
   test("shows error message", () => {
     const errorMessage = "An error occured";
-    renderWithRedux(<Sidebar />, {
+    renderWithProviders(<Sidebar />, {
       ...rootInitialState,
       categories: { ...rootInitialState.categories, error: errorMessage },
     });
@@ -36,7 +36,7 @@ describe("<Sidebar />", () => {
     mockedAxios.get.mockResolvedValueOnce({ status: 200, data: { name } });
     jest.useFakeTimers();
 
-    const { mockStore } = renderWithRedux(<Sidebar />);
+    const { mockStore } = renderWithProviders(<Sidebar />);
 
     fireEvent.click(screen.getByRole("button", { name: /slow fetch/i }));
 
@@ -58,7 +58,7 @@ describe("<Sidebar />", () => {
     mockedAxios.get.mockResolvedValueOnce({ status: 500 });
     jest.useFakeTimers();
 
-    const { mockStore } = renderWithRedux(<Sidebar />);
+    const { mockStore } = renderWithProviders(<Sidebar />);
 
     fireEvent.click(screen.getByRole("button", { name: /slow fetch/i }));
 

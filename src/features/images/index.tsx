@@ -8,7 +8,7 @@ import { css } from "@emotion/css";
 import { useParams } from "react-router-dom";
 import ErrorMessage from "components/error-message";
 import Loading from "components/loading";
-import { mediaQuery } from "../../utils/css-commons";
+import { mediaQuery } from "utils/css-commons";
 
 const Frame = styled.div`
   display: flex;
