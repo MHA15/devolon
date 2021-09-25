@@ -81,7 +81,6 @@ describe("<Images />", () => {
     mockStore.clearActions();
     fireEvent.click(screen.getByRole("button", { name: /Load More/i }));
     await waitFor(() => null, { timeout: 500 });
-    console.log(mockStore.getActions());
     expect(mockStore.getActions()).toMatchObject([
       { type: fetchImagesByCategory.pending.type },
       {
