@@ -1,16 +1,32 @@
 import React from "react";
-import { screen } from "@testing-library/react";
+import { fireEvent, screen } from "@testing-library/react";
 import App from "./App";
 import { renderWithProviders, sleep } from "./utils/test-helpers";
-import Images from "./features/images";
+import { rootReducer } from "./store";
+import { configureStore } from "@reduxjs/toolkit";
 
-test("renders initial count", () => {
-  renderWithProviders(<App />);
-  const zero = screen.getByText("0");
-  expect(zero).toBeInTheDocument();
-});
-test("shows loading on initial", async () => {
-  renderWithProviders(<Images />, undefined, "/1");
-  await sleep(500);
-  expect(screen.getByText(/Loading/i)).toBeVisible();
+describe("App integrated tests", () => {
+  beforeEach((cb) => {
+    renderWithProviders(<App />, configureStore({ reducer: rootReducer }));
+    sleep(2000).then(cb);
+  });
+
+  test("shows categories in sidebar", async () => {
+    expect(
+      screen.getByTestId("categories-list").children.length
+    ).toBeGreaterThan(0);
+  });
+
+  test("shows 10 images for selected category on initial", async () => {
+    expect(screen.getByTestId("images-container").children.length).toEqual(10);
+  });
+
+  test("add 10 more images after clicking load more", async () => {
+    const imagesCount = screen.getByTestId("images-container").children.length;
+    fireEvent.click(screen.getByTestId("load-more"));
+    await sleep(2000);
+    expect(screen.getByTestId("images-container").children.length).toEqual(
+      imagesCount + 10
+    );
+  });
 });
