@@ -35,7 +35,7 @@ export const categoriesSlice = createSlice({
       state.loading = false;
     },
     [fetchCategories.rejected.type]: (state, action) => {
-      state.error = action.payload;
+      state.error = action.error;
       state.loading = false;
     },
   },

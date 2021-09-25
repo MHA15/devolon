@@ -54,7 +54,7 @@ const Images: React.FC = () => {
       `}
     >
       <div
-        id="images-container"
+        data-testid="images-container"
         className={css`
           display: flex;
           flex-wrap: wrap;
@@ -71,7 +71,7 @@ const Images: React.FC = () => {
           </Frame>
         ))}
       </div>
-      {loading && <Loading id="images-loading" />}
+      {loading && <Loading data-testid="images-loading" />}
       {error && <ErrorMessage>{error}</ErrorMessage>}
       <Button
         aria-label="load more images"

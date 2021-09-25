@@ -18,9 +18,11 @@ export const rootInitialState = {
 
 export const renderWithProviders = (
   ui: JSX.Element,
-  initialState: RootState = rootInitialState
+  initialState: RootState = rootInitialState,
+  initialRoute?: string
 ) => {
   const history = createMemoryHistory();
+  initialRoute && history.push(initialRoute);
   const store = mockStore(initialState);
   return {
     ...render(
@@ -31,3 +33,9 @@ export const renderWithProviders = (
     mockStore: store,
   };
 };
+
+export function sleep(millisecond: number) {
+  return new Promise((r) => setTimeout(r, millisecond));
+}
+
+export function f() {}

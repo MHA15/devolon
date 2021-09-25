@@ -1,18 +1,21 @@
 import { screen, fireEvent, waitFor } from "@testing-library/react";
+import "@testing-library/jest-dom";
 import Images from "./index";
 import React from "react";
-import { imagesReducer } from "./slice";
+import { imagesActions, imagesReducer } from "./slice";
 import { renderWithProviders, rootInitialState } from "utils/test-helpers";
 import api from "api";
 import { fetchImagesByCategory } from "./slice";
 
-jest.mock("axios");
+jest.mock("api");
 const mockedAxios = api as jest.Mocked<typeof api>;
 
 describe("<Images />", () => {
-  test("shows zero as initial value", () => {
+  beforeAll(() => jest.useFakeTimers());
+
+  test("shows empty list as initial value", () => {
     renderWithProviders(<Images />);
-    expect(screen.getByText("0")).toBeVisible();
+    expect(screen.getByTestId("images-container").children.length).toBe(0);
   });
 
   test("shows loading message", () => {
@@ -32,49 +35,51 @@ describe("<Images />", () => {
     expect(screen.getByText(errorMessage)).toBeVisible();
   });
 
-  test("load more success", async () => {
-    const name = "cra-template-typekit";
-    mockedAxios.get.mockResolvedValueOnce({ status: 200, data: { name } });
-    jest.useFakeTimers();
+  test("dispatch mounting actions", async () => {
+    mockedAxios.get.mockResolvedValue({ status: 200, data: [] });
 
     const { mockStore } = renderWithProviders(<Images />);
-
-    fireEvent.click(screen.getByRole("button", { name: /slow fetch/i }));
-
-    jest.runAllTimers();
-    // Normally we would wait for an element to show up
-    // https://github.com/testing-library/react-testing-library#complex-example
+    expect(mockStore.getActions()).toMatchObject([
+      { type: imagesActions.clear.type },
+      { type: fetchImagesByCategory.pending.type },
+    ]);
+    mockStore.clearActions();
     await waitFor(() => null, { timeout: 500 });
+    expect(mockStore.getActions()).toMatchObject([
+      { type: fetchImagesByCategory.fulfilled.type, payload: [] },
+    ]);
+    mockStore.clearActions();
+  });
 
-    expect(mockStore.getActions()[0].type).toEqual(
-      fetchImagesByCategory.pending.type
-    );
-    expect(mockStore.getActions()[1].type).toEqual(
-      fetchImagesByCategory.fulfilled.type
-    );
-    expect(mockStore.getActions()[1].payload).toEqual(name.length);
+  test("load more success", async () => {
+    mockedAxios.get.mockResolvedValue({ status: 200, data: [] });
+    const { mockStore } = renderWithProviders(<Images />);
+    await waitFor(() => null, { timeout: 500 });
+    mockStore.clearActions();
+    fireEvent.click(screen.getByRole("button", { name: /Load More/i }));
+    await waitFor(() => null, { timeout: 500 });
+    expect(mockStore.getActions()).toMatchObject([
+      { type: fetchImagesByCategory.pending.type },
+      { type: fetchImagesByCategory.fulfilled.type, payload: [] },
+    ]);
   });
 
   test("load more error", async () => {
-    mockedAxios.get.mockResolvedValueOnce({ status: 500 });
-    jest.useFakeTimers();
-
+    mockedAxios.get.mockRejectedValue({ status: 500, data: null });
     const { mockStore } = renderWithProviders(<Images />);
 
-    fireEvent.click(screen.getByRole("button", { name: /slow fetch/i }));
-
-    jest.runAllTimers();
-    // Normally we would wait for an element to show up
-    // https://github.com/testing-library/react-testing-library#complex-example
     await waitFor(() => null, { timeout: 500 });
-
-    expect(mockStore.getActions()[0].type).toEqual(
-      fetchImagesByCategory.pending.type
-    );
-    expect(mockStore.getActions()[1].type).toEqual(
-      fetchImagesByCategory.rejected.type
-    );
-    expect(mockStore.getActions()[1].payload).toEqual("Something went wrong.");
+    mockStore.clearActions();
+    fireEvent.click(screen.getByRole("button", { name: /Load More/i }));
+    await waitFor(() => null, { timeout: 500 });
+    console.log(mockStore.getActions());
+    expect(mockStore.getActions()).toMatchObject([
+      { type: fetchImagesByCategory.pending.type },
+      {
+        type: fetchImagesByCategory.rejected.type,
+        error: { message: "Something went wrong." },
+      },
+    ]);
   });
 });
 
@@ -92,16 +97,16 @@ describe("ImagesSlice", () => {
     expect(
       imagesReducer(
         { ...rootInitialState.images, loading: true },
-        { type: fetchImagesByCategory.fulfilled.type, payload: 100 }
+        { type: fetchImagesByCategory.fulfilled.type, payload: [] }
       )
-    ).toEqual({ ...rootInitialState.images, loading: false, value: 100 });
+    ).toEqual({ ...rootInitialState.images, loading: false, value: [] });
   });
 
   test("sets error and stop loading on fetch error", () => {
     expect(
       imagesReducer(
         { ...rootInitialState.images, loading: true },
-        { type: fetchImagesByCategory.rejected, payload: "Some error message." }
+        { type: fetchImagesByCategory.rejected, error: "Some error message." }
       )
     ).toEqual({
       ...rootInitialState.images,

@@ -49,7 +49,7 @@ export const imagesSlice = createSlice({
       state.loading = false;
     },
     [fetchImagesByCategory.rejected.type]: (state, action) => {
-      state.error = action.payload;
+      state.error = action.error;
       state.loading = false;
     },
   },
