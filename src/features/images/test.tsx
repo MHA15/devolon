@@ -3,7 +3,11 @@ import "@testing-library/jest-dom";
 import Images from "./index";
 import React from "react";
 import { imagesActions, imagesReducer } from "./slice";
-import { renderWithProviders, rootInitialState } from "utils/test-helpers";
+import {
+  mockStoreCreator,
+  renderWithProviders,
+  rootInitialState,
+} from "utils/test-helpers";
 import api from "api";
 import { fetchImagesByCategory } from "./slice";
 
@@ -19,26 +23,29 @@ describe("<Images />", () => {
   });
 
   test("shows loading message", () => {
-    renderWithProviders(<Images />, {
+    const mockStore = mockStoreCreator({
       ...rootInitialState,
       images: { ...rootInitialState.images, loading: true },
     });
+    renderWithProviders(<Images />, mockStore);
     expect(screen.getByText(/Loading/i)).toBeVisible();
   });
 
   test("shows error message", () => {
     const errorMessage = "An error occured";
-    renderWithProviders(<Images />, {
+    const mockStore = mockStoreCreator({
       ...rootInitialState,
       images: { ...rootInitialState.images, error: errorMessage },
     });
+    renderWithProviders(<Images />, mockStore);
     expect(screen.getByText(errorMessage)).toBeVisible();
   });
 
   test("dispatch mounting actions", async () => {
     mockedAxios.get.mockResolvedValue({ status: 200, data: [] });
 
-    const { mockStore } = renderWithProviders(<Images />);
+    const mockStore = mockStoreCreator(rootInitialState);
+    renderWithProviders(<Images />, mockStore);
     expect(mockStore.getActions()).toMatchObject([
       { type: imagesActions.clear.type },
       { type: fetchImagesByCategory.pending.type },
@@ -53,7 +60,8 @@ describe("<Images />", () => {
 
   test("load more success", async () => {
     mockedAxios.get.mockResolvedValue({ status: 200, data: [] });
-    const { mockStore } = renderWithProviders(<Images />);
+    const mockStore = mockStoreCreator(rootInitialState);
+    renderWithProviders(<Images />, mockStore);
     await waitFor(() => null, { timeout: 500 });
     mockStore.clearActions();
     fireEvent.click(screen.getByRole("button", { name: /Load More/i }));
@@ -66,7 +74,8 @@ describe("<Images />", () => {
 
   test("load more error", async () => {
     mockedAxios.get.mockRejectedValue({ status: 500, data: null });
-    const { mockStore } = renderWithProviders(<Images />);
+    const mockStore = mockStoreCreator(rootInitialState);
+    renderWithProviders(<Images />, mockStore);
 
     await waitFor(() => null, { timeout: 500 });
     mockStore.clearActions();

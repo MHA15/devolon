@@ -3,7 +3,11 @@ import "@testing-library/jest-dom";
 import Sidebar from "./index";
 import React from "react";
 import { categoriesReducer } from "./slice";
-import { renderWithProviders, rootInitialState } from "utils/test-helpers";
+import {
+  mockStoreCreator,
+  renderWithProviders,
+  rootInitialState,
+} from "utils/test-helpers";
 import api from "api";
 import { fetchCategories } from "./slice";
 
@@ -19,26 +23,28 @@ describe("<Sidebar />", () => {
   });
 
   test("shows loading message", () => {
-    renderWithProviders(<Sidebar />, {
+    const mockStore = mockStoreCreator({
       ...rootInitialState,
       categories: { ...rootInitialState.categories, loading: true },
     });
+    renderWithProviders(<Sidebar />, mockStore);
     expect(screen.getByText(/Loading/i)).toBeVisible();
   });
 
   test("shows error message", () => {
     const errorMessage = "An error occured";
-    renderWithProviders(<Sidebar />, {
+    const mockStore = mockStoreCreator({
       ...rootInitialState,
       categories: { ...rootInitialState.categories, error: errorMessage },
     });
+    renderWithProviders(<Sidebar />, mockStore);
     expect(screen.getByText(errorMessage)).toBeVisible();
   });
 
   test("dispatch mounting actions", async () => {
     mockedAxios.get.mockResolvedValue({ status: 200, data: [] });
-
-    const { mockStore } = renderWithProviders(<Sidebar />);
+    const mockStore = mockStoreCreator(rootInitialState);
+    renderWithProviders(<Sidebar />, mockStore);
     expect(mockStore.getActions()).toMatchObject([
       { type: fetchCategories.pending.type },
     ]);

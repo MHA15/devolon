@@ -1,15 +1,14 @@
 import { render } from "@testing-library/react";
 import React from "react";
 import { Provider } from "react-redux";
-import { Router } from "react-router";
-import { createMemoryHistory } from "history";
 import configureStore from "redux-mock-store";
 import thunk from "redux-thunk";
 import { initialState as imagesInitialState } from "features/images/slice";
 import { initialState as categoriesInitialState } from "features/sidebar/slice";
-import { RootState } from "store";
+import { MemoryRouter } from "react-router-dom";
+import appStore, { RootState } from "store";
 
-const mockStore = configureStore([thunk]);
+export const mockStoreCreator = configureStore<RootState>([thunk]);
 
 export const rootInitialState = {
   images: imagesInitialState,
@@ -18,24 +17,15 @@ export const rootInitialState = {
 
 export const renderWithProviders = (
   ui: JSX.Element,
-  initialState: RootState = rootInitialState,
-  initialRoute?: string
+  store: typeof appStore = mockStoreCreator(rootInitialState)
 ) => {
-  const history = createMemoryHistory();
-  initialRoute && history.push(initialRoute);
-  const store = mockStore(initialState);
-  return {
-    ...render(
-      <Router history={history}>
-        <Provider store={store}>{ui}</Provider>
-      </Router>
-    ),
-    mockStore: store,
-  };
+  return render(
+    <MemoryRouter>
+      <Provider store={store}>{ui}</Provider>
+    </MemoryRouter>
+  );
 };
 
 export function sleep(millisecond: number) {
   return new Promise((r) => setTimeout(r, millisecond));
 }
-
-export function f() {}
