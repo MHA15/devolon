@@ -68,7 +68,7 @@ const Sidebar: React.FC = () => {
       <Logo src={logo} alt="logo" />
       {loading && <Loading id="sidebar-loading" />}
       {error && <ErrorMessage id="sidebar-error">{error}</ErrorMessage>}
-      <CategoriesList>
+      <CategoriesList data-testid="categories-list">
         {value.map((category) => (
           <CategoryItem key={category.id} to={"./" + category.id}>
             {category.name}
